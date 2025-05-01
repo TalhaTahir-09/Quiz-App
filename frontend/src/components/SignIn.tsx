@@ -20,15 +20,18 @@ function SignIn() {
       .required("Required!")
       .oneOf([Yup.ref("password")], "Passwords must match"),
   });
-  const onSubmitHandler = async (values: User) => {
+  const onSubmitHandler = async (values: User, setFieldError: any) => {
+    let user = { username: values.username, password: values.password };
     try {
       const response = await axios.post(
-        "http://localhost:3001/users/signup",
-        values
+        "http://localhost:3000/users/signup",
+        user
       );
       console.log(response);
     } catch (error) {
-      if (error) throw error;
+      if (axios.isAxiosError(error) && error.response?.status == 409) {
+        setFieldError("username", "Username already exists");
+      }
     }
   };
   return (
@@ -49,8 +52,8 @@ function SignIn() {
                 cpassword: "",
               }}
               validationSchema={SignupSchema}
-              onSubmit={(values) => {
-                onSubmitHandler(values);
+              onSubmit={(values, { setFieldError } ) => {
+                onSubmitHandler(values, setFieldError);
               }}
             >
               <Form>
