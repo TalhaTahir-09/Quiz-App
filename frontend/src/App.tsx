@@ -1,10 +1,10 @@
 import "./App.css";
 import { Routes, Route } from "react-router";
-import SignIn from "./components/SignIn.tsx";
+import SignUp from "./components/SignUp.js";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<SignIn />} />
+      <Route path="/signup" element={<SignUp />} />
     </Routes>
   );
 }
