@@ -7,4 +7,4 @@ const pool = sql.createPool({
   database: process.env.DB_DATABASE,
 });
 
-module.exports = { PromisePool: pool.promise(), pool: pool };
+module.exports = pool;

@@ -27,6 +27,8 @@ function SignIn() {
         "http://localhost:3000/users/signup",
         user
       );
+      localStorage.setItem("accessToken", "")
+      localStorage.setItem("accessToken", response.data.accessToken);
       console.log(response);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status == 409) {
@@ -34,9 +36,6 @@ function SignIn() {
       }
     }
   };
-  function isEmpty(obj: User) {
-    return Object.keys(obj).length === 0;
-  }
 
   return (
     <div className="sign-up-page-wrapper">
@@ -60,7 +59,7 @@ function SignIn() {
                 onSubmitHandler(values, setFieldError);
               }}
             >
-              {({ isValid, dirty, initialValues }) => (
+              {({ isValid, dirty }) => (
                 <Form>
                   <div className="inner-form-div w-full gap-4">
                     <div className="w-full">

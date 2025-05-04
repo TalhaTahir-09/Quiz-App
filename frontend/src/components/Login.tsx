@@ -1,12 +1,15 @@
 import { Formik, Field, ErrorMessage, Form } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import { useNavigate } from "react-router";
+interface User {
+  username: string;
+  password: string;
+  cpassword: string;
+}
+
 function SignIn() {
-  interface User {
-    username: string;
-    password: string;
-    cpassword: string;
-  }
+  const navigate = useNavigate();
   const SignupSchema = Yup.object().shape({
     username: Yup.string()
       .min(3, "Too Short!")
@@ -22,11 +25,12 @@ function SignIn() {
     try {
       const response = await axios.post(
         "http://localhost:3000/users/login",
-        user,
+        user
       );
+      localStorage.setItem("accessToken", "");
 
-      localStorage.setItem("accessToken", response.data.accessToken)
-      console.log(response);
+      localStorage.setItem("accessToken", response.data.accessToken);
+      navigate("/home");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status == 409) {
         setFieldError("username", "Username already exists");
