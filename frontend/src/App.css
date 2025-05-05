@@ -12,9 +12,10 @@ body {
 }
 .sign-up-box{
   width: 35vw;
-  height: 600px;
-  padding-inline: 2rem;
-  padding-block: 1.5rem;
+  height: max-content;
+
+  padding-inline: 3rem;
+  padding-block: 3rem;
   border-radius: 5%;
   background-color: #fff;
 }

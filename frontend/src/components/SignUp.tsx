@@ -1,7 +1,11 @@
 import { Formik, Field, ErrorMessage, Form } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import { useNavigate } from "react-router";
+
 function SignIn() {
+
+  const navigate = useNavigate();
   interface User {
     username: string;
     password: string;
@@ -27,9 +31,9 @@ function SignIn() {
         "http://localhost:3000/users/signup",
         user
       );
-      localStorage.setItem("accessToken", "")
+      localStorage.setItem("accessToken", "");
       localStorage.setItem("accessToken", response.data.accessToken);
-      console.log(response);
+      navigate("/home")
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status == 409) {
         setFieldError("username", "Username already exists");
@@ -41,11 +45,11 @@ function SignIn() {
     <div className="sign-up-page-wrapper">
       <div className="sign-up-container">
         <div className="sign-up-box">
-          <div className="sign-up-form-heading flex items-center flex-col justify-center">
+          <div className="sign-up-form-heading gap-2 flex items-center flex-col justify-center">
             <h1 className="sign-up-heading text-gray-900 text-4xl">
               Welcome to Queezy
             </h1>
-            <h1 className="text-gray-900 text-2xl font-semibold">Sign Up</h1>
+            <h1 className="text-gray-900 text-2xl">Sign Up</h1>
           </div>
           <div className="sign-up-inputs">
             <Formik

@@ -28,7 +28,6 @@ function SignIn() {
         user
       );
       localStorage.setItem("accessToken", "");
-
       localStorage.setItem("accessToken", response.data.accessToken);
       navigate("/home");
     } catch (error) {
@@ -42,11 +41,11 @@ function SignIn() {
     <div className="sign-up-page-wrapper">
       <div className="sign-up-container">
         <div className="sign-up-box">
-          <div className="sign-up-form-heading flex items-center flex-col justify-center">
-            <h1 className="sign-up-heading text-gray-900 text-4xl">
+          <div className="sign-up-form-heading flex gap-2 items-center flex-col justify-center">
+          <h1 className="sign-up-heading text-gray-900 text-4xl">
               Welcome to Queezy
             </h1>
-            <h1 className="text-gray-900 text-2xl font-semibold">Sign Up</h1>
+            <h1 className="text-gray-900 text-2xl">Sign Up</h1>
           </div>
           <div className="sign-up-inputs">
             <Formik

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
+// Token Authentication
 
 function authToken(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
@@ -17,8 +18,7 @@ function authToken(req, res, next) {
     next();
   });
 }
-// Token Authentication
-router.get("/home", authToken, (req, res) => {
+router.get("/home", (req, res) => {
     res.send("Worked").status(200)
 });
 
