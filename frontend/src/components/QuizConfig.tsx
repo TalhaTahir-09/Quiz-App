@@ -1,25 +1,29 @@
 import { useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
-import { Form, Select, Button } from "antd";
+import { Form, Select, Button, InputNumber } from "antd";
 import "@ant-design/v5-patch-for-react-19";
 
 function QuizConfig() {
   const token = localStorage.getItem("accessToken");
   const navigate = useNavigate();
-  async function onFinish(values: { category: number; difficulty: number }) {
+  async function onFinish(values: {
+    category: number;
+    difficulty: number;
+    amount: number;
+  }) {
     console.log(`Form Submitter ${values}`);
     console.log("Ran");
-    const { category, difficulty } = values;
+    const { category, difficulty, amount } = values;
     const query = new URLSearchParams({
       category: `${category}`,
       difficulty: `${difficulty}`,
+      amount: `${amount}`,
     }).toString();
     navigate(`/quiz?${query}`);
     console.log(query);
-    // const url = `https://opentdb.com/api.php?amount=10&category=${category}&difficulty=${difficulty}&type=multiple`;
-    // const response = await axios.get(url)
   }
+
   useEffect(() => {
     const responseFunction = async () => {
       if (!token) {
@@ -61,6 +65,9 @@ function QuizConfig() {
           requiredMark={false}
         >
           <div className="grid">
+            <Form.Item label="Select Amount:" name={"amount"}>
+              <InputNumber min={1} max={12} defaultValue={10} />
+            </Form.Item>
             <Form.Item
               label="Select Category:"
               name={"category"}
@@ -81,7 +88,9 @@ function QuizConfig() {
             <Form.Item
               label="Select Difficulty:"
               name={"difficulty"}
-              rules={[{ required: true, message: "Please select a category" }]}
+              rules={[
+                { required: true, message: "Please select a difficulty" },
+              ]}
             >
               <Select placeholder="Select Difficulty...">
                 <Select.Option value="any">Any Difficulty</Select.Option>

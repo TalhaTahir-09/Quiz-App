@@ -17,11 +17,12 @@ function QuizPage() {
     async function getData() {
       const paramsString = window.location.search;
       const searchParams = new URLSearchParams(paramsString);
-      const { category, difficulty } = {
+      const { category, difficulty, amount } = {
         category: searchParams.get("category"),
         difficulty: searchParams.get("difficulty"),
+        amount: searchParams.get("amount"),
       };
-      const url = `https://opentdb.com/api.php?amount=10&category=${category}&difficulty=${difficulty}&type=multiple`;
+      const url = `https://opentdb.com/api.php?amount=${amount}&category=${category}&difficulty=${difficulty}&type=multiple`;
       const response = await axios.get(url);
       setQuestions(response.data.results);
     }
@@ -43,7 +44,11 @@ function QuizPage() {
     console.log(matches);
   }
   if (!questions.length) {
-    return <h1>Loading....</h1>;
+    return (
+      <div className="flex items-center justify-center w-screen h-screen">
+        <h1>Loading....</h1>
+      </div>
+    );
   }
 
   function shuffleArray(array: string[]): string[] {
