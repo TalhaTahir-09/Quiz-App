@@ -1,8 +1,48 @@
+import { useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router";
 import { Form, Select, Button } from "antd";
+import "@ant-design/v5-patch-for-react-19";
+
 function QuizConfig() {
-  function onFinish(values: object) {
-    console.log(values);
+  const token = localStorage.getItem("accessToken");
+  const navigate = useNavigate();
+  async function onFinish(values: { category: number; difficulty: number }) {
+    console.log(`Form Submitter ${values}`);
+    console.log("Ran");
+    const { category, difficulty } = values;
+    const query = new URLSearchParams({
+      category: `${category}`,
+      difficulty: `${difficulty}`,
+    }).toString();
+    navigate(`/quiz?${query}`);
+    console.log(query);
+    // const url = `https://opentdb.com/api.php?amount=10&category=${category}&difficulty=${difficulty}&type=multiple`;
+    // const response = await axios.get(url)
   }
+  useEffect(() => {
+    const responseFunction = async () => {
+      if (!token) {
+        navigate("/signup");
+      } else {
+        try {
+          const response = await axios.get(
+            "http://localhost:3000/app/quiz-config",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          console.log(response);
+        } catch (error) {
+          if (axios.isAxiosError(error) && error.response?.status == 401) {
+            navigate("/signup");
+          }
+        }
+      }
+    };
+    responseFunction();
+  }, []);
+
   return (
     <div className="home-page-wrapper flex justify-center items-center h-svh">
       <div className="nav-container w-2/4 bg-white px-12 pt-6 rounded-2xl">
