@@ -8,10 +8,11 @@ const cookieParser = require("cookie-parser");
 
 app.use(cors({ origin: "http://localhost:5173" }));
 const pool = require("./db.js");
-app.use("/app", AppRoutes);
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/users", AuthRoutes);
+app.use("/app", AppRoutes);
 
 pool.getConnection((error, connection) => {
   if (error) {
