@@ -15,15 +15,15 @@ const sevenDaysLater = JSON.stringify(
 
 // SIGNUP
 router.post("/signup", async (req, res) => {
-  const user = req.body;
   const { username, password } = req.body;
 
   try {
     // Check if user exists
     const [rows] = await promisePool.execute(
       "SELECT * FROM users WHERE users.username = ?",
-      [user.username]
+      [username]
     );
+    console.log(rows)
     if (rows.length) {
       return res.status(409).send("Username already exists");
     }
@@ -32,8 +32,10 @@ router.post("/signup", async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
 
     // Tokens
+    const user = { id: rows[0].id, username: username }
     const accessToken = generateToken("access", user);
     const refreshToken = generateToken("refresh", user);
+
     // Insert into database
     await promisePool.execute(
       "INSERT INTO users(username, password, refreshToken, expiration) VALUES (?, ?, ?, ?)",
@@ -41,11 +43,16 @@ router.post("/signup", async (req, res) => {
     );
     const [rows1] = await promisePool.execute("select * from users;");
     console.log(rows1);
-
-    res.json({ accessToken: accessToken }).status(201);
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    res.status(201).json({ accessToken: accessToken });
   } catch (error) {
     console.error(error);
-    res.json({ error: "Database error" }).status(500);
+    res.status(500).json({ error: "Database error" });
   }
 });
 
@@ -57,22 +64,29 @@ router.post("/login", async (req, res) => {
       "select * from users where users.username = ?",
       [username]
     );
-    const correctPassword = await bcrypt.compare(password, rows2[0].password);
+
+
     if (!rows2.length) {
       return res.send("Wrong username or password!").status(404);
-    }else if(correctPassword){
-      const accessToken = generateToken("access", {username: username, password: password});
-      const refreshToken = generateToken("refresh", {username: username, password: password});
-      const [rows3] = await promisePool.execute("update users set refreshToken = ? where username = ?", [refreshToken, username])
+    }
+    const correctPassword = await bcrypt.compare(password, rows2[0].password);
+
+    if (correctPassword) {
+      const user = { id: rows2[0].id, username: username };
+      console.log(user);
+      const accessToken = generateToken("access", user);
+      const refreshToken = generateToken("refresh", user);
+      await promisePool.execute("update users set refreshToken = ? where username = ?", [refreshToken, username])
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: true,
-        sameSite: "Strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000, 
+        sameSite: "Lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
-      res.json({accessToken: accessToken}).status(202);
+      console.log
+      res.json({ accessToken: accessToken }).status(202);
     }
-    
+
   } catch (error) {
     if (error) throw error;
   }
@@ -80,17 +94,17 @@ router.post("/login", async (req, res) => {
 function generateToken(type, user) {
   if (type === "access") {
     return jwt.sign(
-      { username: user.username },
+      {id: user.id, username: user.username },
       process.env.PRIVATE_ACCESS_TOKEN_KEY,
       { expiresIn: "15m" }
     );
   } else if (type === "refresh") {
     return jwt.sign(
-      { username: user.username },
+      { id: user.id, username: user.username },
       process.env.PRIVATE_REFRESH_TOKEN_KEY
     );
   }
   return "NOT A VALID TYPE";
 }
 
-module.exports = router;
+module.exports = { router: router, TokenFn: generateToken };

@@ -5,6 +5,8 @@ import Login from './components/Login.js'
 import Home from './components/Home.js'
 import QuizConfig from './components/QuizConfig.js'
 import QuizPage from "./components/QuizPage.js";
+import Profile from './components/Profile.js'
+
 function App() {
   return (
     <Routes>
@@ -13,6 +15,8 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/quiz-config" element={<QuizConfig />} />
       <Route path="/quiz" element={<QuizPage />} />
+      <Route path="/profile" element={<Profile />} />
+
     </Routes>
   );
 }

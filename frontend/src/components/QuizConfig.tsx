@@ -5,7 +5,6 @@ import { Form, Select, Button, InputNumber } from "antd";
 import "@ant-design/v5-patch-for-react-19";
 
 function QuizConfig() {
-  const token = localStorage.getItem("accessToken");
   const navigate = useNavigate();
   async function onFinish(values: {
     category: number;
@@ -14,7 +13,12 @@ function QuizConfig() {
   }) {
     console.log(`Form Submitter ${values}`);
     console.log("Ran");
-    const { category, difficulty, amount } = values;
+    const { category, difficulty } = values;
+    let amount = values.amount;
+    if (!amount) {
+      amount = 10;
+    }
+    // const queryData = difficulty
     const query = new URLSearchParams({
       category: `${category}`,
       difficulty: `${difficulty}`,
@@ -26,6 +30,7 @@ function QuizConfig() {
 
   useEffect(() => {
     const responseFunction = async () => {
+      const token = localStorage.getItem("accessToken");
       if (!token) {
         navigate("/signup");
       } else {
@@ -34,6 +39,7 @@ function QuizConfig() {
             "http://localhost:3000/app/quiz-config",
             {
               headers: { Authorization: `Bearer ${token}` },
+              withCredentials: true,
             }
           );
           console.log(response);
@@ -63,6 +69,7 @@ function QuizConfig() {
           style={{ maxWidth: 600 }}
           onFinish={onFinish}
           requiredMark={false}
+          initialValues={{ category: "any", difficulty: "easy", amount: 1 }}
         >
           <div className="grid">
             <Form.Item label="Select Amount:" name={"amount"}>
@@ -93,7 +100,6 @@ function QuizConfig() {
               ]}
             >
               <Select placeholder="Select Difficulty...">
-                <Select.Option value="any">Any Difficulty</Select.Option>
                 <Select.Option value="easy">Easy</Select.Option>
                 <Select.Option value="medium">Medium</Select.Option>
                 <Select.Option value="hard">Hard</Select.Option>

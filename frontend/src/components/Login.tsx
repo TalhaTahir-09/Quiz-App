@@ -25,7 +25,8 @@ function SignIn() {
     try {
       const response = await axios.post(
         "http://localhost:3000/users/login",
-        user
+        user,
+        { withCredentials: true }
       );
       localStorage.setItem("accessToken", "");
       localStorage.setItem("accessToken", response.data.accessToken);
@@ -42,10 +43,10 @@ function SignIn() {
       <div className="sign-up-container">
         <div className="sign-up-box">
           <div className="sign-up-form-heading flex gap-2 items-center flex-col justify-center">
-          <h1 className="sign-up-heading text-gray-900 text-4xl">
-              Welcome to Queezy
+            <h1 className="sign-up-heading text-gray-900 text-4xl">
+              Welcome Back!
             </h1>
-            <h1 className="text-gray-900 text-2xl">Sign Up</h1>
+            <h1 className="text-gray-900 text-2xl">Login</h1>
           </div>
           <div className="sign-up-inputs">
             <Formik

@@ -9,10 +9,11 @@ function Home() {
   const searchParams = new URLSearchParams(search);
   const score = searchParams.get("score");
   const navigate = useNavigate();
-  const token = localStorage.getItem("accessToken");
 
   useEffect(() => {
     const responseFunction = async () => {
+      const token = localStorage.getItem("accessToken");
+      console.log(token);
       if (!token) {
         navigate("/signup");
       } else {
@@ -21,11 +22,25 @@ function Home() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
+            withCredentials: true,
           });
           console.log(response);
         } catch (error) {
           if (axios.isAxiosError(error) && error.response?.status == 401) {
             navigate("/signup");
+          } else if (
+            axios.isAxiosError(error) &&
+            error.response?.status == 403
+          ) {
+            const response = await axios.get("http://localhost:3000/app/refresh", {
+              withCredentials: true,
+            });
+            console.log(response.data.accessToken)
+            localStorage.setItem("accessToken", "")
+            localStorage.setItem("accessToken", response.data.accessToken)
+
+
+            
           }
         }
       }
@@ -34,6 +49,9 @@ function Home() {
   }, []);
   const handleSubmitQuiz = () => {
     navigate("/quiz-config");
+  };
+  const handleSubmitProfile = () => {
+    navigate("/profile");
   };
   const handleSubmitLead = () => {
     navigate("/leaderboard");
@@ -50,6 +68,7 @@ function Home() {
 
           <div className="button-container-home flex items-center justify-center gap-6">
             <Button title="Start Quiz" onSubmit={handleSubmitQuiz} />
+            <Button title="View Profile" onSubmit={handleSubmitProfile} />
             <Button title="LeaderBoard" onSubmit={handleSubmitLead} />
           </div>
           <button></button>
@@ -68,6 +87,7 @@ function Home() {
 
           <div className="button-container-home flex items-center justify-center gap-6">
             <Button title="Start Quiz" onSubmit={handleSubmitQuiz} />
+            <Button title="View Profile" onSubmit={handleSubmitProfile} />
             <Button title="LeaderBoard" onSubmit={handleSubmitLead} />
           </div>
           <button></button>

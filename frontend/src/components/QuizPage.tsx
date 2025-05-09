@@ -17,19 +17,22 @@ function QuizPage() {
     async function getData() {
       const paramsString = window.location.search;
       const searchParams = new URLSearchParams(paramsString);
-      const { category, difficulty, amount } = {
+      const {  amount, category, difficulty } = {
+        amount: searchParams.get("amount"),
         category: searchParams.get("category"),
         difficulty: searchParams.get("difficulty"),
-        amount: searchParams.get("amount"),
       };
-      const url = `https://opentdb.com/api.php?amount=${amount}&category=${category}&difficulty=${difficulty}&type=multiple`;
+      const url = `https://opentdb.com/api.php?amount=${amount}${category === "any" ? "": "&category=" + category }${difficulty === "any" ? "": "&difficulty=" + difficulty }&type=multiple`;
       const response = await axios.get(url);
-      setQuestions(response.data.results);
+      await setQuestions(response.data.results);
     }
     getData();
   }, []);
 
   async function onFinish(values: any) {
+    const token = localStorage.getItem("accessToken");
+    const searchParams = new URLSearchParams(window.location.search)
+    const difficulty = searchParams.get("difficulty");
     const correctAnswers = correctAnswersFn();
     let userAnswers: string[] = [];
     for (let key in values) {
@@ -39,6 +42,20 @@ function QuizPage() {
       userAnswers.includes(value)
     );
     const score = matches.length.toString();
+    console.log(score);
+
+    const response = await axios.post(
+      "http://localhost:3000/app/score",
+      { score: score, difficulty: difficulty },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      }
+    );
+    if (response?.data?.accessToken) {
+      localStorage.setItem("accessToken", "");
+      localStorage.setItem("accessToken", response.data.accessToken);
+    }
     const params = new URLSearchParams({ score: score });
     navigate(`/home?${params}`);
     console.log(matches);
