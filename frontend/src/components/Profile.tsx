@@ -59,20 +59,20 @@ function QuizConfig() {
           Profile:
         </h1>
         <p className="text-blue-600 text-lg font-medium text-center mb-6">
-          Attempted Quizzes: {userData?.attempts}
+          Attempted Quizzes: {userData?.attempts || "0"}
         </p>
         <div className="flex justify-center gap-4">
           <div className="bg-gray-800 text-sm text-white rounded-md px-4 py-2 flex items-center gap-2 shadow-sm">
             <span className="text-teal-300 font-semibold">Easy</span>
-            <span>{userData?.easy}</span>
-          </div>
+            <span>{userData?.easy || "0"}</span>
+          </div>  
           <div className="bg-gray-800 text-sm text-white rounded-md px-4 py-2 flex items-center gap-2 shadow-sm">
             <span className="text-yellow-400 font-semibold">Medium</span>
-            <span>{userData?.medium}</span>
+            <span>{userData?.medium || "0"}</span>
           </div>
           <div className="bg-gray-800 text-sm text-white rounded-md px-4 py-2 flex items-center gap-2 shadow-sm">
             <span className="text-red-400 font-semibold">Hard</span>
-            <span>{userData?.hard}</span>
+            <span>{userData?.hard || "0"}</span>
           </div>
         </div>
       </div>

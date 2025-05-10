@@ -4,7 +4,6 @@ import axios from "axios";
 import { useNavigate } from "react-router";
 
 function SignIn() {
-
   const navigate = useNavigate();
   interface User {
     username: string;
@@ -29,11 +28,13 @@ function SignIn() {
     try {
       const response = await axios.post(
         "http://localhost:3000/users/signup",
-        user
+        user,
+        { withCredentials: true }
       );
       localStorage.setItem("accessToken", "");
       localStorage.setItem("accessToken", response.data.accessToken);
-      navigate("/home")
+      navigate("/home");
+      console.log("ran");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status == 409) {
         setFieldError("username", "Username already exists");
@@ -44,7 +45,7 @@ function SignIn() {
   return (
     <div className="sign-up-page-wrapper">
       <div className="sign-up-container">
-        <div className="sign-up-box">
+        <div className="sign-up-box"  style={{paddingInline: "2rem"}}>
           <div className="sign-up-form-heading gap-2 flex items-center flex-col justify-center">
             <h1 className="sign-up-heading text-gray-900 text-4xl">
               Welcome to Queezy

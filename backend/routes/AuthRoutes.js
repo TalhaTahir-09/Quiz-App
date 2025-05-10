@@ -30,19 +30,21 @@ router.post("/signup", async (req, res) => {
 
     // Hash password
     const hash = await bcrypt.hash(password, 10);
-
-    // Tokens
-    const user = { id: rows[0].id, username: username }
-    const accessToken = generateToken("access", user);
-    const refreshToken = generateToken("refresh", user);
-
     // Insert into database
     await promisePool.execute(
       "INSERT INTO users(username, password, refreshToken, expiration) VALUES (?, ?, ?, ?)",
       [username, hash, refreshToken, sevenDaysLater]
     );
+
+
     const [rows1] = await promisePool.execute("select * from users;");
     console.log(rows1);
+    // Tokens
+    const user = { id: rows[1].id, username: username }
+    const accessToken = generateToken("access", user);
+    const refreshToken = generateToken("refresh", user);
+
+    // Cookies
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
@@ -76,6 +78,7 @@ router.post("/login", async (req, res) => {
       console.log(user);
       const accessToken = generateToken("access", user);
       const refreshToken = generateToken("refresh", user);
+      
       await promisePool.execute("update users set refreshToken = ? where username = ?", [refreshToken, username])
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -94,7 +97,7 @@ router.post("/login", async (req, res) => {
 function generateToken(type, user) {
   if (type === "access") {
     return jwt.sign(
-      {id: user.id, username: user.username },
+      { id: user.id, username: user.username },
       process.env.PRIVATE_ACCESS_TOKEN_KEY,
       { expiresIn: "15m" }
     );

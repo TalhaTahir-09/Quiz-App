@@ -61,6 +61,16 @@ router.get("/profile", authToken, async (req, res) => {
   console.log(scoreObj);
   res.status(200).json(scoreObj);
 })
+router.get('/leaderboard',authToken, async (req, res) => {
+  const [rows] = await promisePool.execute("SELECT * FROM scores")
+  const [user] =  await promisePool.execute("SELECT * FROM users")
+  let userData = []
+  user.forEach((value) => {
+    userData.push({id: value.id, username: value.username})
+  })
+  
+  res.status(200).json({scores: rows, userData: userData})
+})
 router.get("/home", authToken, (req, res) => {
   res.send("Authorized").status(200);
 });

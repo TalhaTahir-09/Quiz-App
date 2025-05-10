@@ -6,6 +6,7 @@ import Home from './components/Home.js'
 import QuizConfig from './components/QuizConfig.js'
 import QuizPage from "./components/QuizPage.js";
 import Profile from './components/Profile.js'
+import Leaderboard from './components/Leaderboard.js'
 
 function App() {
   return (
@@ -16,6 +17,8 @@ function App() {
       <Route path="/quiz-config" element={<QuizConfig />} />
       <Route path="/quiz" element={<QuizPage />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/leaderboard" element={<Leaderboard />} />
+
 
     </Routes>
   );
