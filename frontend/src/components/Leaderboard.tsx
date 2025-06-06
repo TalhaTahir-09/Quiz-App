@@ -39,12 +39,14 @@ function Leaderboard() {
             axios.isAxiosError(error) &&
             error.response?.status == 403
           ) {
+            console.log("new access token");
             const response = await axios.get(
               "http://localhost:3000/app/refresh",
               {
                 withCredentials: true,
               }
             );
+            console.log(response);
             localStorage.setItem("accessToken", "");
             localStorage.setItem("accessToken", response.data.accessToken);
           }
@@ -57,25 +59,31 @@ function Leaderboard() {
   console.log(scores, userData);
   const userScores: any = {};
   scores.forEach(
-    (value: { user_id: number; difficulty: string; score: number }) => {
-      if (!userScores[value.user_id]) {
-        const userObj: any = userData.find((user: any) => user.id === value.user_id )
-        userScores[value.user_id] = { user_id: value.user_id, score: 0, username: userObj.username};
+    (value: { user_name: string; difficulty: string; score: number }) => {
+      if (!userScores[value.user_name]) {
+        const userObj: any = userData.find(
+          (user: any) => user.username === value.user_name
+        );
+        userScores[value.user_name] = {
+          user_name: value.user_name,
+          score: 0,
+          username: userObj.username,
+        };
       }
-      userScores[value.user_id].score += value.score * pointsTable[value.difficulty];
+      userScores[value.user_name].score +=
+        value.score * pointsTable[value.difficulty];
     }
   );
   const leaderboardData = Object.values(userScores)
-  .sort((a: any , b: any) => b.score - a.score)
-  .map((value: any, index: number) => ({
-    id: value.user_id,
-    name: value.username,
-    score: value.score,
-    rank: index + 1
-  }))
-  const topThreeUsers = leaderboardData.slice(0, 3)
-  console.log(topThreeUsers)
-
+    .sort((a: any, b: any) => b.score - a.score)
+    .map((value: any, index: number) => ({
+      id: value.user_id,
+      name: value.username,
+      score: value.score,
+      rank: index + 1,
+    }));
+  const topThreeUsers = leaderboardData.slice(0, 3);
+  console.log(topThreeUsers);
 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
@@ -86,7 +94,7 @@ function Leaderboard() {
     return "Loading";
   }
   return (
-    <div className="leaderboard-wrapper p-10 h-screen bg-white text-black flex flex-col gap-12">
+    <div className="leaderboard-wrapper p-10 bg-white text-black flex flex-col gap-12">
       <div className="upper flex flex-col gap-20">
         <div className="header-cont flex justify-between items-center">
           <div className="header">
@@ -113,7 +121,9 @@ function Leaderboard() {
             />
             <div className="username text-2xl">
               {" "}
-              <p style={{ margin: 0 }}>{topThreeUsers[1]?.name || "Username...."}</p>
+              <p style={{ margin: 0 }}>
+                {topThreeUsers[1]?.name || "Username...."}
+              </p>
             </div>
           </div>
           <div
@@ -127,7 +137,9 @@ function Leaderboard() {
             />
             <div className="username text-2xl">
               {" "}
-              <p style={{ margin: 0 }}>{topThreeUsers[0]?.name || "Username...."}</p>
+              <p style={{ margin: 0 }}>
+                {topThreeUsers[0]?.name || "Username...."}
+              </p>
             </div>
           </div>
           <div
@@ -141,7 +153,9 @@ function Leaderboard() {
             />
             <div className="username text-2xl">
               {" "}
-              <p style={{ margin: 0 }}>{topThreeUsers[2]?.name || "Username...."}</p>
+              <p style={{ margin: 0 }}>
+                {topThreeUsers[2]?.name || "Username...."}
+              </p>
             </div>
           </div>
         </div>

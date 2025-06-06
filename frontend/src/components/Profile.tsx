@@ -36,13 +36,14 @@ function QuizConfig() {
             axios.isAxiosError(error) &&
             error.response?.status == 403
           ) {
+            console.log("new access token requested");
             const response = await axios.get(
               "http://localhost:3000/app/refresh",
               {
                 withCredentials: true,
               }
             );
-            console.log(response.data.accessToken);
+            console.log(response);
             localStorage.setItem("accessToken", "");
             localStorage.setItem("accessToken", response.data.accessToken);
           }
@@ -65,7 +66,7 @@ function QuizConfig() {
           <div className="bg-gray-800 text-sm text-white rounded-md px-4 py-2 flex items-center gap-2 shadow-sm">
             <span className="text-teal-300 font-semibold">Easy</span>
             <span>{userData?.easy || "0"}</span>
-          </div>  
+          </div>
           <div className="bg-gray-800 text-sm text-white rounded-md px-4 py-2 flex items-center gap-2 shadow-sm">
             <span className="text-yellow-400 font-semibold">Medium</span>
             <span>{userData?.medium || "0"}</span>
