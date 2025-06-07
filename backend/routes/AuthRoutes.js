@@ -40,7 +40,7 @@ router.post("/signup", async (req, res) => {
     const [rows1] = await promisePool.execute("select * from users;");
     console.log(rows1);
     // Tokens
-    const user = { id: rows[1].id, username: username }
+    const user = { id: rows[0].id, username: username }
     const accessToken = generateToken("access", user);
     const refreshToken = generateToken("refresh", user);
 
@@ -78,7 +78,6 @@ router.post("/login", async (req, res) => {
       console.log(user);
       const accessToken = generateToken("access", user);
       const refreshToken = generateToken("refresh", user);
-      
       await promisePool.execute("update users set refreshToken = ? where username = ?", [refreshToken, username])
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,

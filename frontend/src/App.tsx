@@ -11,7 +11,7 @@ import Leaderboard from './components/Leaderboard.js'
 function App() {
   return (
     <Routes>
-      <Route path="/signup" element={<SignUp />} />
+      <Route path="/" element={<SignUp />} />
       <Route path="/login" element={<Login />} />
       <Route path="/home" element={<Home />} />
       <Route path="/quiz-config" element={<QuizConfig />} />
