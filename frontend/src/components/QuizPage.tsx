@@ -17,21 +17,63 @@ function QuizPage() {
     async function getData() {
       const paramsString = window.location.search;
       const searchParams = new URLSearchParams(paramsString);
-      const {  amount, category, difficulty } = {
+      const { amount, category, difficulty } = {
         amount: searchParams.get("amount"),
         category: searchParams.get("category"),
         difficulty: searchParams.get("difficulty"),
       };
-      const url = `https://opentdb.com/api.php?amount=${amount}${category === "any" ? "": "&category=" + category }${difficulty === "any" ? "": "&difficulty=" + difficulty }&type=multiple`;
+      const url = `https://opentdb.com/api.php?amount=${amount}${
+        category === "any" ? "" : "&category=" + category
+      }${
+        difficulty === "any" ? "" : "&difficulty=" + difficulty
+      }&type=multiple`;
       const response = await axios.get(url);
       await setQuestions(response.data.results);
     }
     getData();
   }, []);
 
+  // useEffect(() => {
+  //   const responseFunction = async () => {
+  //     const token = localStorage.getItem("accessToken");
+  //     console.log(token);
+  //     if (!token) {
+  //       navigate("/signup");
+  //     } else {
+  //       try {
+  //         const response = await axios.get("http://localhost:3000/app/score", {
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //           },
+  //           withCredentials: true,
+  //         });
+  //         console.log(response);
+  //       } catch (error) {
+  //         if (axios.isAxiosError(error) && error.response?.status == 401) {
+  //           navigate("/signup");
+  //         } else if (
+  //           axios.isAxiosError(error) &&
+  //           error.response?.status == 403
+  //         ) {
+  //           console.log("new access token");
+  //           const response = await axios.get(
+  //             "http://localhost:3000/app/refresh",
+  //             {
+  //               withCredentials: true,
+  //             }
+  //           );
+  //           console.log(response);
+  //           localStorage.setItem("accessToken", "");
+  //           localStorage.setItem("accessToken", response.data.accessToken);
+  //         }
+  //       }
+  //     }
+  //   };
+  //   responseFunction();
+  // }, []);
   async function onFinish(values: any) {
     const token = localStorage.getItem("accessToken");
-    const searchParams = new URLSearchParams(window.location.search)
+    const searchParams = new URLSearchParams(window.location.search);
     const difficulty = searchParams.get("difficulty");
     const correctAnswers = correctAnswersFn();
     let userAnswers: string[] = [];
@@ -42,20 +84,37 @@ function QuizPage() {
       userAnswers.includes(value)
     );
     const score = matches.length.toString();
-    console.log(score);
-
-    const response = await axios.post(
-      "http://localhost:3000/app/score",
-      { score: score, difficulty: difficulty },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      }
-    );
-    if (response?.data?.accessToken) {
-      localStorage.setItem("accessToken", "");
-      localStorage.setItem("accessToken", response.data.accessToken);
-    }
+    try {
+      await axios.post(
+        "http://localhost:3000/app/score",
+        { score: score, difficulty: difficulty },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
+    } catch (error) {
+          if (axios.isAxiosError(error) && error.response?.status == 401) {
+            navigate("/signup");
+          } else if (
+            axios.isAxiosError(error) &&
+            error.response?.status == 403
+          ) {
+            console.log("new access token");
+            const response = await axios.get(
+              "http://localhost:3000/app/refresh",
+              {
+                withCredentials: true,
+              }
+            );
+            localStorage.setItem("accessToken", "");
+            localStorage.setItem("accessToken", response.data.accessToken);
+          }
+        }
+    // if (response?.data?.accessToken) {
+    //   localStorage.setItem("accessToken", "");
+    //   localStorage.setItem("accessToken", response.data.accessToken);
+    // }
     const params = new URLSearchParams({ score: score });
     navigate(`/home?${params}`);
     console.log(matches);

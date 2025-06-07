@@ -27,7 +27,11 @@ router.post("/signup", async (req, res) => {
     if (rows.length) {
       return res.status(409).send("Username already exists");
     }
-
+    // Tokens
+    const user = { username: username }
+    const accessToken = generateToken("access", user);
+    const refreshToken = generateToken("refresh", user);
+    
     // Hash password
     const hash = await bcrypt.hash(password, 10);
     // Insert into database
@@ -39,10 +43,7 @@ router.post("/signup", async (req, res) => {
 
     const [rows1] = await promisePool.execute("select * from users;");
     console.log(rows1);
-    // Tokens
-    const user = { id: rows[0].id, username: username }
-    const accessToken = generateToken("access", user);
-    const refreshToken = generateToken("refresh", user);
+
 
     // Cookies
     res.cookie("refreshToken", refreshToken, {
@@ -54,14 +55,14 @@ router.post("/signup", async (req, res) => {
     res.status(201).json({ accessToken: accessToken });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Database error" });
+    res.status(500).json({ error: "WDatabase error" });
   }
 });
 
 // Login
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
-  try {
+try {
     const [rows2] = await promisePool.execute(
       "select * from users where users.username = ?",
       [username]
@@ -78,6 +79,7 @@ router.post("/login", async (req, res) => {
       console.log(user);
       const accessToken = generateToken("access", user);
       const refreshToken = generateToken("refresh", user);
+
       await promisePool.execute("update users set refreshToken = ? where username = ?", [refreshToken, username])
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -96,13 +98,13 @@ router.post("/login", async (req, res) => {
 function generateToken(type, user) {
   if (type === "access") {
     return jwt.sign(
-      { id: user.id, username: user.username },
+      { username: user.username },
       process.env.PRIVATE_ACCESS_TOKEN_KEY,
-      { expiresIn: "15m" }
+      { expiresIn: "15s" }
     );
   } else if (type === "refresh") {
     return jwt.sign(
-      { id: user.id, username: user.username },
+      { username: user.username },
       process.env.PRIVATE_REFRESH_TOKEN_KEY
     );
   }

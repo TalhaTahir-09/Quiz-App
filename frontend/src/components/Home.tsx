@@ -13,7 +13,6 @@ function Home() {
   useEffect(() => {
     const responseFunction = async () => {
       const token = localStorage.getItem("accessToken");
-      console.log(token);
       if (!token) {
         navigate("/signup");
       } else {
@@ -24,7 +23,6 @@ function Home() {
             },
             withCredentials: true,
           });
-          console.log(response);
         } catch (error) {
           if (axios.isAxiosError(error) && error.response?.status == 401) {
             navigate("/signup");
@@ -32,15 +30,23 @@ function Home() {
             axios.isAxiosError(error) &&
             error.response?.status == 403
           ) {
-            const response = await axios.get("http://localhost:3000/app/refresh", {
-              withCredentials: true,
-            });
-            console.log(response.data.accessToken)
-            localStorage.setItem("accessToken", "")
-            localStorage.setItem("accessToken", response.data.accessToken)
-
-
-            
+            const response = await axios.get(
+              "http://localhost:3000/app/refresh",
+            {
+                withCredentials: true,
+              }
+            );
+            console.log(response);
+            localStorage.setItem("accessToken", "");
+            localStorage.setItem("accessToken", response.data.accessToken);
+          }
+          else if (
+            axios.isAxiosError(error) &&
+            error.response?.status == 400
+          ) {
+            console.log("Ran refresh token generetd")
+            localStorage.setItem("accessToken", " ")
+            navigate("/signup")
           }
         }
       }
