@@ -18,8 +18,6 @@ function App() {
       <Route path="/quiz" element={<QuizPage />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/leaderboard" element={<Leaderboard />} />
-
-
     </Routes>
   );
 }

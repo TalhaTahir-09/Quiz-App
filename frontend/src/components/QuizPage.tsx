@@ -100,7 +100,6 @@ function QuizPage() {
             axios.isAxiosError(error) &&
             error.response?.status == 403
           ) {
-            console.log("new access token");
             const response = await axios.get(
               "http://localhost:3000/app/refresh",
               {
@@ -111,10 +110,6 @@ function QuizPage() {
             localStorage.setItem("accessToken", response.data.accessToken);
           }
         }
-    // if (response?.data?.accessToken) {
-    //   localStorage.setItem("accessToken", "");
-    //   localStorage.setItem("accessToken", response.data.accessToken);
-    // }
     const params = new URLSearchParams({ score: score });
     navigate(`/home?${params}`);
     console.log(matches);

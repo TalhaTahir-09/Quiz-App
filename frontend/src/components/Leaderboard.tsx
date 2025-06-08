@@ -94,7 +94,7 @@ function Leaderboard() {
     return "Loading";
   }
   return (
-    <div className="leaderboard-wrapper p-10 bg-white text-black flex flex-col gap-12">
+    <div className="leaderboard-wrapper min-h-screen p-10 bg-white text-black flex flex-col gap-12">
       <div className="upper flex flex-col gap-20">
         <div className="header-cont flex justify-between items-center">
           <div className="header">
@@ -122,7 +122,7 @@ function Leaderboard() {
             <div className="username text-2xl">
               {" "}
               <p style={{ margin: 0 }}>
-                {topThreeUsers[1]?.name || "Username...."}
+                {topThreeUsers[1]?.name || "..."}
               </p>
             </div>
           </div>
@@ -154,7 +154,7 @@ function Leaderboard() {
             <div className="username text-2xl">
               {" "}
               <p style={{ margin: 0 }}>
-                {topThreeUsers[2]?.name || "Username...."}
+                {topThreeUsers[2]?.name || "..."}
               </p>
             </div>
           </div>

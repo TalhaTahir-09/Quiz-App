@@ -4,7 +4,7 @@
 }
 .sign-up-page-wrapper,
 .home-page-wrapper {
-  height: 100vh;
+  min-height: 100vh;
   background-color: rgb(15, 23, 46);
 
   overflow: hidden;

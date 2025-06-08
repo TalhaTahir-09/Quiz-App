@@ -100,7 +100,7 @@ function generateToken(type, user) {
     return jwt.sign(
       { username: user.username },
       process.env.PRIVATE_ACCESS_TOKEN_KEY,
-      { expiresIn: "15s" }
+      { expiresIn: "15m" }
     );
   } else if (type === "refresh") {
     return jwt.sign(

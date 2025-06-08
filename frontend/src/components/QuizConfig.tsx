@@ -28,38 +28,43 @@ function QuizConfig() {
     console.log(query);
   }
 
-  useEffect(() => {
+ useEffect(() => {
     const responseFunction = async () => {
       const token = localStorage.getItem("accessToken");
       if (!token) {
         navigate("/signup");
       } else {
         try {
-          const response = await axios.get(
-            "http://localhost:3000/app/quiz-config",
-            {
-              headers: { Authorization: `Bearer ${token}` },
-              withCredentials: true,
-            }
-          );
-          console.log(response);
-        }catch (error) {
+          await axios.get("http://localhost:3000/app/quiz-config", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },  
+            withCredentials: true,
+          });
+        } catch (error) {
           if (axios.isAxiosError(error) && error.response?.status == 401) {
             navigate("/signup");
           } else if (
             axios.isAxiosError(error) &&
             error.response?.status == 403
           ) {
-            console.log("new access token")
             const response = await axios.get(
               "http://localhost:3000/app/refresh",
-              {
+            {
                 withCredentials: true,
               }
             );
             console.log(response);
             localStorage.setItem("accessToken", "");
             localStorage.setItem("accessToken", response.data.accessToken);
+          }
+          else if (
+            axios.isAxiosError(error) &&
+            error.response?.status == 400
+          ) {
+            console.log("Ran refresh token generetd")
+            localStorage.setItem("accessToken", " ")
+            navigate("/signup")
           }
         }
       }
