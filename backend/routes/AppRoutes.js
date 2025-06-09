@@ -54,6 +54,19 @@ router.get("/refresh", async (req, res) => {
 
 
 })
+router.get("/signout", authToken, async (req, res) => {
+  const { username } = await req.user;
+  console.log(username)
+  const [db] = await promisePool.execute("UPDATE users SET refreshToken=? WHERE users.username=?", ["", username])
+  const [db1] = await promisePool.execute("SELECT * FROM users WHERE users.username=?", [username])
+  console.log(db1)
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'Strict',
+  })
+  res.send("Hello").status(200)
+})
 
 
 router.post("/score", authToken, async (req, res) => {
