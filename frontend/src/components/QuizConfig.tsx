@@ -28,50 +28,20 @@ function QuizConfig() {
     console.log(query);
   }
 
- useEffect(() => {
+  useEffect(() => {
     const responseFunction = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        navigate("/signup");
-      } else {
         try {
-          await axios.get("http://localhost:3000/app/quiz-config", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },  
+          await axios.get("http://localhost:3000/app/protected-route", {
             withCredentials: true,
           });
         } catch (error) {
           if (axios.isAxiosError(error) && error.response?.status == 401) {
             navigate("/signup");
-          } else if (
-            axios.isAxiosError(error) &&
-            error.response?.status == 403
-          ) {
-            const response = await axios.get(
-              "http://localhost:3000/app/refresh",
-            {
-                withCredentials: true,
-              }
-            );
-            console.log(response);
-            localStorage.setItem("accessToken", "");
-            localStorage.setItem("accessToken", response.data.accessToken);
           }
-          else if (
-            axios.isAxiosError(error) &&
-            error.response?.status == 400
-          ) {
-            console.log("Ran refresh token generetd")
-            localStorage.setItem("accessToken", " ")
-            navigate("/signup")
-          }
-        }
       }
     };
     responseFunction();
   }, []);
-
   return (
     <div className="home-page-wrapper flex justify-center items-center h-svh">
       <div className="nav-container w-2/4 bg-white px-12 pt-6 rounded-2xl">

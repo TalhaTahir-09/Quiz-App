@@ -15,48 +15,21 @@ function Leaderboard() {
 
   useEffect(() => {
     const responseFunction = async () => {
-      const token = localStorage.getItem("accessToken");
-      console.log(token);
-      if (!token) {
-        navigate("/signup");
-      } else {
-        try {
-          const response = await axios.get(
-            "http://localhost:3000/app/leaderboard",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-              withCredentials: true,
-            }
-          );
-          await setScores(response.data.scores);
-          await setUserData(response.data.userData);
-        } catch (error) {
-          if (axios.isAxiosError(error) && error.response?.status == 401) {
-            navigate("/signup");
-          } else if (
-            axios.isAxiosError(error) &&
-            error.response?.status == 403
-          ) {
-            console.log("new access token");
-            const response = await axios.get(
-              "http://localhost:3000/app/refresh",
-              {
-                withCredentials: true,
-              }
-            );
-            console.log(response);
-            localStorage.setItem("accessToken", "");
-            localStorage.setItem("accessToken", response.data.accessToken);
-          }
+      try {
+        const response = await axios.get("http://localhost:3000/app/leaderboard", {
+          withCredentials: true,
+        });
+         setScores(response?.data?.scores);
+         setUserData(response?.data?.userData);
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status == 401) {
+          navigate("/signup");
         }
       }
     };
     responseFunction();
   }, []);
-
-  console.log(scores, userData);
+  console.log(scores)
   const userScores: any = {};
   scores.forEach(
     (value: { user_name: string; difficulty: string; score: number }) => {
@@ -83,7 +56,6 @@ function Leaderboard() {
       rank: index + 1,
     }));
   const topThreeUsers = leaderboardData.slice(0, 3);
-  console.log(topThreeUsers);
 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
@@ -121,9 +93,7 @@ function Leaderboard() {
             />
             <div className="username text-2xl">
               {" "}
-              <p style={{ margin: 0 }}>
-                {topThreeUsers[1]?.name || "..."}
-              </p>
+              <p style={{ margin: 0 }}>{topThreeUsers[1]?.name || "..."}</p>
             </div>
           </div>
           <div
@@ -153,9 +123,7 @@ function Leaderboard() {
             />
             <div className="username text-2xl">
               {" "}
-              <p style={{ margin: 0 }}>
-                {topThreeUsers[2]?.name || "..."}
-              </p>
+              <p style={{ margin: 0 }}>{topThreeUsers[2]?.name || "..."}</p>
             </div>
           </div>
         </div>

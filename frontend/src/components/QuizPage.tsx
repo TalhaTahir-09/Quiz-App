@@ -33,7 +33,7 @@ function QuizPage() {
     getData();
   }, []);
 
-  // useEffect(() => {
+
   //   const responseFunction = async () => {
   //     const token = localStorage.getItem("accessToken");
   //     console.log(token);
@@ -72,7 +72,6 @@ function QuizPage() {
   //   responseFunction();
   // }, []);
   async function onFinish(values: any) {
-    const token = localStorage.getItem("accessToken");
     const searchParams = new URLSearchParams(window.location.search);
     const difficulty = searchParams.get("difficulty");
     const correctAnswers = correctAnswersFn();
@@ -84,32 +83,13 @@ function QuizPage() {
       userAnswers.includes(value)
     );
     const score = matches.length.toString();
-    try {
       await axios.post(
         "http://localhost:3000/app/score",
         { score: score, difficulty: difficulty },
         {
-          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         }
       );
-    } catch (error) {
-          if (axios.isAxiosError(error) && error.response?.status == 401) {
-            navigate("/signup");
-          } else if (
-            axios.isAxiosError(error) &&
-            error.response?.status == 403
-          ) {
-            const response = await axios.get(
-              "http://localhost:3000/app/refresh",
-              {
-                withCredentials: true,
-              }
-            );
-            localStorage.setItem("accessToken", "");
-            localStorage.setItem("accessToken", response.data.accessToken);
-          }
-        }
     const params = new URLSearchParams({ score: score });
     navigate(`/home?${params}`);
     console.log(matches);

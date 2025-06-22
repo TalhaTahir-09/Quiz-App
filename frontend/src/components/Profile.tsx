@@ -14,40 +14,15 @@ function QuizConfig() {
 
   useEffect(() => {
     const responseFunction = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        navigate("/signup");
-      } else {
         try {
-          const response = await axios.get(
-            "http://localhost:3000/app/profile",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-              withCredentials: true,
-            }
-          );
-          setUserData(response.data);
+          const response = await axios.get("http://localhost:3000/app/profile", {
+            withCredentials: true,
+          });
+          setUserData(response?.data)
         } catch (error) {
           if (axios.isAxiosError(error) && error.response?.status == 401) {
             navigate("/signup");
-          } else if (
-            axios.isAxiosError(error) &&
-            error.response?.status == 403
-          ) {
-            console.log("new access token requested");
-            const response = await axios.get(
-              "http://localhost:3000/app/refresh",
-              {
-                withCredentials: true,
-              }
-            );
-            console.log(response);
-            localStorage.setItem("accessToken", "");
-            localStorage.setItem("accessToken", response.data.accessToken);
           }
-        }
       }
     };
     responseFunction();

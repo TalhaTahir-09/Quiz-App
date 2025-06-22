@@ -23,17 +23,16 @@ function SignIn() {
   const onSubmitHandler = async (values: User, setFieldError: any) => {
     let user = { username: values.username, password: values.password };
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:3000/users/login",
         user,
         { withCredentials: true }
       );
-      localStorage.setItem("accessToken", "");
-      localStorage.setItem("accessToken", response.data.accessToken);
       navigate("/home");
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status == 409) {
-        setFieldError("username", "Username already exists");
+      if (axios.isAxiosError(error) && error.response?.status == 401) {
+        console.log(error)
+        setFieldError("username", "Incorrect username or password!");
       }
     }
   };

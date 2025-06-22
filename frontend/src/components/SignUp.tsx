@@ -26,15 +26,12 @@ function SignIn() {
   const onSubmitHandler = async (values: User, setFieldError: any) => {
     let user = { username: values.username, password: values.password };
     try {
-      const response = await axios.post(
+       await axios.post(
         "http://localhost:3000/users/signup",
         user,
         { withCredentials: true }
       );
-      localStorage.setItem("accessToken", "");
-      localStorage.setItem("accessToken", response.data.accessToken);
       navigate("/home");
-      console.log("ran");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status == 409) {
         setFieldError("username", "Username already exists");
