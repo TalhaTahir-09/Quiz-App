@@ -7,6 +7,7 @@ const pool = require('../db.js');
 const { cookieFn } = require("./AuthRoutes.js");
 const promisePool = pool.promise();
 const cookieIntializer = (require("./AuthRoutes.js")).cookieFn;
+const AuthModel = require("../models/Auth.js")
 // Token Authentication
 
 function authToken(req, res, next) {
@@ -36,12 +37,12 @@ async function refreshAccessToken(req, res, refreshToken) {
   console.log(refreshToken)
   try {
     const { username } = jwt.verify(refreshToken, process.env.PRIVATE_REFRESH_TOKEN_KEY)
-    const [db] = await promisePool.execute("SELECT * FROM USERS WHERE users.username=? LIMIT 1", [username])
-    if (refreshToken === db[0].refreshToken) {
+    const row = await AuthModel.findUserByName(username);
+    if (refreshToken === row.refreshToken) {
       console.log("Ran refresh")
       const accessToken = generateToken("access", { username: username })
       const newRefreshToken = generateToken("refresh", { username: username })
-      await promisePool.execute("update users set refreshToken =? where username =?", [newRefreshToken, username])
+      await AuthModel.loginUpdate(newRefreshToken, username);
       cookieFn(res, refreshToken, accessToken)
     }
     console.log("username: " + username)
@@ -64,9 +65,7 @@ async function refreshAccessToken(req, res, refreshToken) {
 }
 router.get("/signout", authToken, async (req, res) => {
   const { username } = await req.user;
-  console.log(username)
-  const [db] = await promisePool.execute("UPDATE users SET refreshToken=? WHERE users.username=?", ["", username])
-  const [db1] = await promisePool.execute("SELECT * FROM users WHERE users.username=?", [username])
+  await AuthModel.loginUpdate("", username)
   res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: true,
@@ -89,7 +88,8 @@ router.post("/score", authToken, async (req, res) => {
     return res.send("Updated").status(200);
   };
   console.log(username)
-  await promisePool.execute("INSERT INTO scores(user_name, difficulty, score) VALUES (?, ?, ?)", [username, difficulty, score])
+  await AuthModel.scoreInsert(username, difficulty, score)
+  // await promisePool.execute("INSERT INTO scores(user_name, difficulty, score) VALUES (?, ?, ?)", [username, difficulty, score])
   console.log("Stored")
   return res.send("Updated").status(200);
 
@@ -99,7 +99,8 @@ router.post("/score", authToken, async (req, res) => {
 router.get("/profile", authToken, async (req, res) => {
   const { username } = await req.user;
   console.log(username)
-  const [rows] = await promisePool.execute("SELECT * FROM scores WHERE scores.user_name=?", [username])
+  const rows = await AuthModel.scoresSearch(username)
+  console.log(rows)
   let scoreObj = { "easy": 0, "medium": 0, "hard": 0, "attempts": rows.length }
   rows.map((value) => {
     if (value.difficulty === "easy") {
@@ -114,8 +115,8 @@ router.get("/profile", authToken, async (req, res) => {
   res.status(200).json(scoreObj);
 })
 router.get('/leaderboard', authToken, async (req, res) => {
-  const [rows] = await promisePool.execute("SELECT * FROM scores")
-  const [user] = await promisePool.execute("SELECT * FROM users")
+  const rows = await AuthModel.returnAllScores()
+  const user = await AuthModel.returnAllUsers()
   let userData = []
   user.forEach((value) => {
     userData.push({ id: value.id, username: value.username })

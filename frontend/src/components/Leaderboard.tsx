@@ -132,7 +132,7 @@ function Leaderboard() {
         className="lower-table rounded-2xl p-4"
         style={{ boxShadow: `-1px 0px 10px #b5b5b5` }}
       >
-        <Table columns={columns} dataSource={leaderboardData} rowKey="id" />
+        <Table columns={columns} dataSource={leaderboardData} rowKey={record => record.id} />
       </div>
     </div>
   );

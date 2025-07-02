@@ -26,15 +26,15 @@ function SignIn() {
   const onSubmitHandler = async (values: User, setFieldError: any) => {
     let user = { username: values.username, password: values.password };
     try {
-       await axios.post(
-        "http://localhost:3000/users/signup",
-        user,
-        { withCredentials: true }
-      );
+      await axios.post("http://localhost:3000/users/signup", user, {
+        withCredentials: true,
+      });
       navigate("/home");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status == 409) {
         setFieldError("username", "Username already exists");
+      }else{
+        throw error;
       }
     }
   };
@@ -42,7 +42,7 @@ function SignIn() {
   return (
     <div className="sign-up-page-wrapper">
       <div className="sign-up-container">
-        <div className="sign-up-box"  style={{paddingInline: "2rem"}}>
+        <div className="sign-up-box" style={{ paddingInline: "2rem" }}>
           <div className="sign-up-form-heading gap-2 flex items-center flex-col justify-center">
             <h1 className="sign-up-heading text-gray-900 text-4xl">
               Welcome to Queezy
