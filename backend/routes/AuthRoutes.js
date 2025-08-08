@@ -1,12 +1,11 @@
 require("dotenv").config();
 const express = require("express");
 const router = express.Router();
-const pool = require("../db.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const promisePool = pool.promise();
-const AuthModel = require("../models/Auth.js")
+const { User } = require("../models/UserModel.js");
 
+// Date
 const now = new Date();
 const sevenDaysLater = JSON.stringify(
   new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
@@ -19,9 +18,13 @@ router.post("/signup", async (req, res) => {
   const { username, password } = req.body;
 
   try {
+
     // Check if user exists
-    const [rows] = await AuthModel.findUserByName(username)
-    if (rows) {
+    // console.log("Users", users)
+    const userExists = await User.findOne({ where: { username: username } })
+    // console.log("Users1", users)
+
+    if (userExists) {
       return res.status(409).send("Username already exists");
     }
     // Tokens\
@@ -33,11 +36,12 @@ router.post("/signup", async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
     // Insert into database
 
-    await AuthModel.insertUser(username, hash, refreshToken, sevenDaysLater)
+    await User.create({ username: username, password: hash, refreshToken: refreshToken, expiration: sevenDaysLater })
     // Cookies
     cookieIntializer(res, refreshToken, accessToken);
     return res.status(200).send("Success");
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Database error" });
   }
 });
@@ -48,21 +52,19 @@ router.post("/login", async (req, res) => {
 
   const { username, password } = req.body;
   try {
-    const row = await AuthModel.findUserByName(username);
-    console.log(row)
-    if (!row) {
-      console.log("now")
+    const userExists = await User.findOne({ where: { username: username } })
+
+    if (!userExists) {
       return res.send("Wrong username or password!").status(404);
     }
-    console.log("now2")
-    const correctPassword = await bcrypt.compare(password, row.password);
+    const userData = userExists.dataValues;
+    const correctPassword = await bcrypt.compare(password, userData.password);
     if (correctPassword) {
-      console.log("correct")
       const user = { username: username };
       const accessToken = generateToken("access", user);
       const refreshToken = generateToken("refresh", user);
       // Update token
-      const updated = await AuthModel.loginUpdate(refreshToken, username);
+      const updated = await User.update({ refreshToken: refreshToken }, { where: { username: username } })
       console.log("Token Updated: " + Boolean(updated))
       cookieIntializer(res, refreshToken, accessToken);
       return res.status(202).send("Successs");
@@ -81,7 +83,6 @@ function generateToken(type, user) {
     return jwt.sign(
       { username: user.username },
       process.env.PRIVATE_ACCESS_TOKEN_KEY,
-      { expiresIn: "15m" }
     );
   } else if (type === "refresh") {
     return jwt.sign(
@@ -98,6 +99,7 @@ function cookieIntializer(res, refreshToken, accessToken) {
     secure: true,
     sameSite: "None",
     maxAge: 7 * 24 * 60 * 60 * 1000,
+    
   });
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
@@ -107,5 +109,4 @@ function cookieIntializer(res, refreshToken, accessToken) {
   });
 }
 
-console.log(sevenDaysLater)
 module.exports = { router: router, TokenFn: generateToken, cookieFn: cookieIntializer };

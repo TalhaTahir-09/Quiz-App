@@ -2,7 +2,13 @@ import { Table } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
-
+type userScores = {
+  [key: string]: {
+    user_name: string;
+    score: number;
+    username: string;
+  };
+};
 function Leaderboard() {
   const pointsTable: any = {
     easy: 1,
@@ -11,16 +17,17 @@ function Leaderboard() {
   };
   const navigate = useNavigate();
   const [scores, setScores] = useState([]);
-  const [userData, setUserData] = useState([]);
 
   useEffect(() => {
     const responseFunction = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/app/leaderboard", {
-          withCredentials: true,
-        });
-         setScores(response?.data?.scores);
-         setUserData(response?.data?.userData);
+        const response = await axios.get(
+          "http://localhost:3000/app/leaderboard",
+          {
+            withCredentials: true,
+          }
+        );
+        setScores(response?.data?.scores);
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status == 401) {
           navigate("/signup");
@@ -29,24 +36,24 @@ function Leaderboard() {
     };
     responseFunction();
   }, []);
-  console.log(scores)
-  const userScores: any = {};
+
+  console.log(scores);
+
+  const userScores: userScores = {};
   scores.forEach(
     (value: { user_name: string; difficulty: string; score: number }) => {
-      if (!userScores[value.user_name]) {
-        const userObj: any = userData.find(
-          (user: any) => user.username === value.user_name
-        );
+      if (userScores[value.user_name] === undefined) {
         userScores[value.user_name] = {
-          user_name: value.user_name,
+          username: value.user_name,
           score: 0,
-          username: userObj.username,
+          user_name: value.user_name,
         };
       }
       userScores[value.user_name].score +=
         value.score * pointsTable[value.difficulty];
     }
   );
+  console.log(userScores, "userScores");
   const leaderboardData = Object.values(userScores)
     .sort((a: any, b: any) => b.score - a.score)
     .map((value: any, index: number) => ({
@@ -56,6 +63,7 @@ function Leaderboard() {
       rank: index + 1,
     }));
   const topThreeUsers = leaderboardData.slice(0, 3);
+  console.log(leaderboardData, "LeaderBoard")
 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
@@ -132,7 +140,10 @@ function Leaderboard() {
         className="lower-table rounded-2xl p-4"
         style={{ boxShadow: `-1px 0px 10px #b5b5b5` }}
       >
-        <Table columns={columns} dataSource={leaderboardData} rowKey={record => record.id} />
+        <Table
+          columns={columns}
+          dataSource={leaderboardData}
+        />
       </div>
     </div>
   );
