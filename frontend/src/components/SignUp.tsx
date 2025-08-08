@@ -34,7 +34,7 @@ function SignIn() {
       if (axios.isAxiosError(error) && error.response?.status == 409) {
         setFieldError("username", "Username already exists");
       }else{
-        throw error;
+        console.log(error);
       }
     }
   };
