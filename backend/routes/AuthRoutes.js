@@ -19,7 +19,6 @@ router.post("/signup", async (req, res) => {
 
   try {
     console.log("Ran Signup");
-
     // Check if user exists
     // console.log("Users", users)
     const userExists = await User.findOne({ where: { username: username } })

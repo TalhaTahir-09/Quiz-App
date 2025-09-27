@@ -34,12 +34,7 @@ function SignIn() {
       if (axios.isAxiosError(error) && error.response?.status == 409) {
         setFieldError("username", "Username already exists");
       }else{
-<<<<<<< HEAD
-        console.log("Error during signup:", error);
-
-=======
         console.log(error);
->>>>>>> refs/remotes/origin/master
       }
     }
   };

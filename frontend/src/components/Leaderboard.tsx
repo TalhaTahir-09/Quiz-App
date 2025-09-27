@@ -46,11 +46,7 @@ function Leaderboard() {
         userScores[value.user_name] = {
           username: value.user_name,
           score: 0,
-<<<<<<< HEAD
-          username: userObj ? userObj.username : value.user_name,
-=======
           user_name: value.user_name,
->>>>>>> refs/remotes/origin/master
         };
       }
       userScores[value.user_name].score +=
