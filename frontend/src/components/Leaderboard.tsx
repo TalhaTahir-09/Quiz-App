@@ -40,7 +40,7 @@ function Leaderboard() {
         userScores[value.user_name] = {
           user_name: value.user_name,
           score: 0,
-          username: userObj.username,
+          username: userObj ? userObj.username : value.user_name,
         };
       }
       userScores[value.user_name].score +=

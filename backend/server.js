@@ -6,7 +6,18 @@ const AuthRoutes = require("./routes/AuthRoutes.js").router;
 const AppRoutes = require("./routes/AppRoutes.js");
 const cookieParser = require("cookie-parser");
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+const allowedOrigins = ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

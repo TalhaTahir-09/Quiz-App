@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const generateToken = (require("./AuthRoutes.js")).TokenFn;
 const pool = require('../db.js');
 const { cookieFn } = require("./AuthRoutes.js");
-const promisePool = pool.promise();
 const cookieIntializer = (require("./AuthRoutes.js")).cookieFn;
 const AuthModel = require("../models/Auth.js")
 // Token Authentication

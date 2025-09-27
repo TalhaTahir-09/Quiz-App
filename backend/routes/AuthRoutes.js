@@ -19,6 +19,8 @@ router.post("/signup", async (req, res) => {
   const { username, password } = req.body;
 
   try {
+    console.log("Ran Signup");
+
     // Check if user exists
     const [rows] = await AuthModel.findUserByName(username)
     if (rows) {
